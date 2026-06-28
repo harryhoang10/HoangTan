@@ -124,9 +124,7 @@
   /* ===== ENHANCEMENTS ===== */
   (function(){var p=document.getElementById('progress');var h=document.documentElement;var tick=false;var lastY=h.scrollTop||0;var b=document.body;
     function upd(){var y=h.scrollTop;var max=h.scrollHeight-h.clientHeight,s=max>0?y/max:0;if(p)p.style.transform='scaleX('+s+')';b.classList.toggle('scrolled',y>18);
-      if(b.classList.contains('menu')){b.classList.remove('nav-hidden');}        /* never hide while mobile menu open */
-      else if(y>140&&y>lastY+4){b.classList.add('nav-hidden');}                  /* scrolling down -> hide */
-      else if(y<lastY-4||y<=140){b.classList.remove('nav-hidden');}             /* scrolling up / near top -> reveal */
+      b.classList.remove('nav-hidden');   /* nav stays visible at all times (sticky, follows scroll) */
       lastY=y;tick=false;}
     function onScroll(){if(!tick){tick=true;requestAnimationFrame(upd);}}
     window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll);upd();})();
@@ -234,5 +232,65 @@
       var f=document.getElementById('contactForm');if(f&&c.email)f.setAttribute('data-to',c.email);
       if(c.name){try{document.title=document.title.replace('[YOUR NAME]',c.name);}catch(e){}}
     }).catch(function(){});
+  })();
+
+  /* ===== floating Contact button (all pages, draggable) -> Home #connect ===== */
+  (function(){
+    if(PF_EDIT) return;
+    var path=location.pathname.split('/').pop();
+    var isHome=(!path||path==='portfolio-home.html'||path==='index.html');
+    var fab=document.createElement('a');
+    fab.className='fab-contact';fab.href=isHome?'#connect':'portfolio-home.html#connect';fab.setAttribute('aria-label','Contact me');
+    fab.innerHTML='<span class="fic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span class="flbl">Contact</span>';
+    document.body.appendChild(fab);
+    try{var pos=JSON.parse(localStorage.getItem('pf-fab')||'null');if(pos){fab.style.left=pos.x+'px';fab.style.top=pos.y+'px';fab.style.right='auto';fab.style.bottom='auto';}}catch(e){}
+    var down=false,moved=false,sx,sy,ox,oy;
+    fab.addEventListener('pointerdown',function(e){down=true;moved=false;sx=e.clientX;sy=e.clientY;var r=fab.getBoundingClientRect();ox=r.left;oy=r.top;try{fab.setPointerCapture(e.pointerId);}catch(e2){}});
+    fab.addEventListener('pointermove',function(e){if(!down)return;var dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>4)moved=true;if(moved){var nx=Math.max(8,Math.min(innerWidth-fab.offsetWidth-8,ox+dx)),ny=Math.max(8,Math.min(innerHeight-fab.offsetHeight-8,oy+dy));fab.style.left=nx+'px';fab.style.top=ny+'px';fab.style.right='auto';fab.style.bottom='auto';}});
+    fab.addEventListener('pointerup',function(){down=false;if(moved){try{var r=fab.getBoundingClientRect();localStorage.setItem('pf-fab',JSON.stringify({x:r.left,y:r.top}));}catch(e3){}}});
+    fab.addEventListener('click',function(e){if(moved){e.preventDefault();return;}if(isHome){e.preventDefault();var t=document.getElementById('connect');if(t)t.scrollIntoView({behavior:'smooth'});}});
+  })();
+
+  /* ===== detail drawer (CRM-style slide-over) for Projects / AI Vibecode ===== */
+  (function(){
+    if(PF_EDIT) return;
+    /* auto-inject "View details" triggers on Projects + AI Vibecode cards */
+    var page=location.pathname.split('/').pop();
+    var btnHTML='View details <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>';
+    function injBtn(p){if(p.querySelector(':scope > .js-drawer'))return;var b=document.createElement('button');b.type='button';b.className='card-cta js-drawer';b.innerHTML=btnHTML;p.appendChild(b);}
+    if(page==='ai-vibecode.html'){[].forEach.call(document.querySelectorAll('#builds .scard'),injBtn);}
+    if(page==='projects.html'){[].forEach.call(document.querySelectorAll('.proj .proj-copy'),injBtn);}
+    var triggers=document.querySelectorAll('.js-drawer');
+    if(!triggers.length) return;
+    var ov=document.createElement('div');ov.className='dwr-ov';
+    ov.innerHTML='<aside class="dwr-panel" role="dialog" aria-modal="true"><button class="dwr-x" aria-label="Close">&times;</button><div class="dwr-head"><div class="dwr-sub"></div><h3 class="dwr-title"></h3><div class="dwr-meta"></div></div><div class="dwr-tabs"></div><div class="dwr-body"></div></aside>';
+    document.body.appendChild(ov);
+    var elT=ov.querySelector('.dwr-title'),elS=ov.querySelector('.dwr-sub'),elM=ov.querySelector('.dwr-meta'),elTabs=ov.querySelector('.dwr-tabs'),elB=ov.querySelector('.dwr-body');
+    function close(){ov.classList.remove('open');document.body.classList.remove('dwr-lock');}
+    ov.addEventListener('click',function(e){if(e.target===ov)close();});
+    ov.querySelector('.dwr-x').addEventListener('click',close);
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+    function extract(card){
+      var h=card.querySelector('h3');var ps=card.querySelectorAll('p');
+      var desc=[].map.call(ps,function(p){return '<p>'+p.innerHTML+'</p>';}).join('');
+      var tags=[].map.call(card.querySelectorAll('.stackline span,.chip,.meta span,.tag'),function(s){return s.textContent.trim();}).filter(Boolean);
+      var seen={},imgs=[];[].forEach.call(card.querySelectorAll('img'),function(im){var s=im.getAttribute('data-full')||im.getAttribute('src');if(s&&!seen[s]){seen[s]=1;imgs.push({src:im.getAttribute('src'),full:s,alt:im.getAttribute('alt')||''});}});
+      return {title:h?h.textContent:(card.getAttribute('data-title')||'Details'),sub:card.getAttribute('data-sub')||'',desc:desc,tags:tags,images:imgs,details:card.getAttribute('data-details')||''};
+    }
+    function open(card){
+      var d=extract(card);
+      elT.textContent=d.title;elS.textContent=d.sub;
+      elM.innerHTML=d.tags.map(function(t){return '<span class="dwr-tag">'+t+'</span>';}).join('');
+      var tabs=[{k:'Overview',html:(d.desc||'<p class="dwr-empty">Summary coming soon.</p>')}];
+      if(d.images.length)tabs.push({k:'Gallery',html:'<div class="dwr-gal">'+d.images.map(function(im){return '<img src="'+im.src+'" data-full="'+im.full+'" alt="'+im.alt+'"/>';}).join('')+'</div>'});
+      tabs.push({k:'Details',html:d.details||'<p class="dwr-empty">More details, files and screenshots will be added here.</p>'});
+      function show(i){elB.innerHTML=tabs[i].html;[].forEach.call(elTabs.children,function(b){b.classList.toggle('on',+b.dataset.i===i);});
+        elB.querySelectorAll('[data-full]').forEach(function(im){im.style.cursor='zoom-in';im.addEventListener('click',function(){var lb=document.getElementById('lightbox');if(lb){lb.querySelector('img').src=im.getAttribute('data-full');lb.classList.add('open');}});});}
+      elTabs.innerHTML=tabs.map(function(t,i){return '<button class="dwr-tab'+(i===0?' on':'')+'" data-i="'+i+'">'+t.k+'</button>';}).join('');
+      [].forEach.call(elTabs.children,function(b){b.addEventListener('click',function(){show(+b.dataset.i);});});
+      show(0);ov.classList.add('open');document.body.classList.add('dwr-lock');
+    }
+    triggers.forEach(function(t){t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();
+      var card=t.closest('[data-card]')||t.closest('.proj')||t.closest('.scard')||t;open(card);});});
   })();
 
