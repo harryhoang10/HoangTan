@@ -86,9 +86,10 @@
   let _hud=false,_hx=0,_hy=0;
   window.addEventListener('pointermove',e=>{_hx=e.clientX;_hy=e.clientY;if(!_hud){_hud=true;requestAnimationFrame(()=>{hudpos.textContent=`PTR X:${pad(_hx)} Y:${pad(_hy)}`;_hud=false;});}});
 
-  /* ---- card spotlight (cursor-follow border glow) ---- */
-  document.querySelectorAll('.core,.bento').forEach(c=>{
-    c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect();
+  /* ---- card spotlight (cursor-follow glow) — unified across ALL card types for consistency ---- */
+  var SPOT='.core,.bento,.scard,.stat,.case,.duocard .inner,.glass .inner,.qcard,.crow,.tool,.feature .frame,.preview-shell,.titem';
+  document.querySelectorAll(SPOT).forEach(function(c){
+    c.addEventListener('pointermove',function(e){var r=c.getBoundingClientRect();
       c.style.setProperty('--cx',(e.clientX-r.left)+'px');c.style.setProperty('--cy',(e.clientY-r.top)+'px');});
   });
 

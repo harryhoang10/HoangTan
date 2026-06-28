@@ -477,3 +477,12 @@ footer a:hover{color:var(--lime)}
    pf-calm class is left on content pages but intentionally has NO dimming rules,
    so every page falls back to the base effect layers (blobs .46, dot-grid .10,
    scanline + HUD + cursor-spotlight) — identical to Home, fully consistent. */
+
+/* ===== unified cursor-follow spotlight — consistent on every card, top to bottom ===== */
+.case,.qcard,.crow,.tool,.feature .frame,.preview-shell{position:relative;overflow:hidden}
+.case::after,.qcard::after,.crow::after,.tool::after,.feature .frame::after,.preview-shell::after,.titem::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;
+  transition:opacity .4s var(--ease);
+  background:radial-gradient(220px circle at var(--cx,50%) var(--cy,50%),rgba(199,247,59,.13),transparent 60%)}
+.case:hover::after,.qcard:hover::after,.crow:hover::after,.tool:hover::after,.feature .frame:hover::after,.preview-shell:hover::after,.titem:hover::after{opacity:1}
+html.light .case::after,html.light .qcard::after,html.light .crow::after,html.light .tool::after,html.light .feature .frame::after,html.light .preview-shell::after,html.light .titem::after{background:radial-gradient(220px circle at var(--cx,50%) var(--cy,50%),rgba(92,154,0,.12),transparent 60%)}
