@@ -415,9 +415,9 @@ html.light .lightbox{background:rgba(244,243,238,.92)}
 .thumb.active,.thumb:hover{opacity:1;border-color:var(--lime);transform:translateY(-2px)}
 .full-stack{display:none;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}
 .full-stack.open{display:grid}
-.full-stack figure{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
-.full-stack img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;cursor:zoom-in}
-.full-stack figcaption{padding:12px 14px;font-size:13px;color:var(--ink-soft)}
+.full-stack figure{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.full-stack img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;cursor:zoom-in;background:linear-gradient(135deg,var(--bg-2) 0%,rgba(199,247,59,.06) 100%)}
+.full-stack figcaption{padding:12px 14px;font-size:13px;color:var(--ink);background:var(--bg-2);border-top:1px solid var(--line)}
 @media(max-width:900px){.proj-main{grid-template-columns:1fr}.full-stack{grid-template-columns:1fr}}
 
 
@@ -530,15 +530,23 @@ html.light .dwr-ov{background:rgba(30,30,28,.4)}
 .dwr-list li{padding-left:18px;position:relative}
 .dwr-list li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:50%;background:var(--lime)}
 .dwr-gal{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.dwr-gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;border:1px solid var(--line);filter:grayscale(.15);transition:filter .3s var(--ease)}
+.dwr-gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:linear-gradient(135deg,var(--bg-2),rgba(199,247,59,.06));filter:grayscale(.15);transition:filter .3s var(--ease)}
 .dwr-gal img:hover{filter:none}
 .dwr-empty{color:var(--ink-soft);font-style:italic}
+/* hero + section + facts inside drawer */
+.dwr-hero{border-radius:16px;overflow:hidden;border:1px solid var(--line);margin-bottom:18px;aspect-ratio:16/9;background:linear-gradient(135deg,var(--bg-2) 0%,rgba(199,247,59,.10) 100%)}
+.dwr-hero img{width:100%;height:100%;object-fit:cover;display:block}
+.dwr-section{color:var(--ink-soft);font-size:15px;line-height:1.75}
+.dwr-section p{margin-bottom:12px}.dwr-section p b{color:var(--ink)}
+.dwr-facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.dwr-facts span{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:7px 11px}
+/* numbered explorable deck */
 .dwr-deck{display:flex;flex-direction:column;gap:16px}
-.dwr-slide{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);position:relative}
-.dwr-slide img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;cursor:zoom-in;filter:grayscale(.12);transition:filter .3s var(--ease)}
+.dwr-slide{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:linear-gradient(135deg,var(--bg-2) 0%,rgba(199,247,59,.06) 100%);position:relative}
+.dwr-slide img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover;background:transparent;cursor:zoom-in;filter:grayscale(.12);transition:filter .3s var(--ease)}
 .dwr-slide img:hover{filter:none}
-.dwr-sn{position:absolute;top:10px;left:10px;z-index:2;font-family:'JetBrains Mono',monospace;font-size:11px;color:#060607;background:var(--lime);border-radius:999px;padding:4px 10px}
-.dwr-slide figcaption{padding:12px 14px;font-size:13px;color:var(--ink-soft)}
+.dwr-sn{position:absolute;top:10px;left:10px;z-index:2;font-family:'JetBrains Mono',monospace;font-size:11px;color:#060607;background:var(--lime);border-radius:999px;padding:4px 10px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.dwr-slide figcaption{padding:13px 15px;font-size:13px;color:var(--ink);background:var(--bg-2);border-top:1px solid var(--line)}
 @media(max-width:600px){.dwr-gal{grid-template-columns:1fr}}
 
 /* ===== Impact dashboard sparks (Home snapshot) ===== */

@@ -280,17 +280,21 @@
     }
     function open(card){
       var d=extract(card);
-      elT.textContent=d.title;elS.textContent=d.sub;
-      elM.innerHTML=d.tags.map(function(t){return '<span class="dwr-tag">'+t+'</span>';}).join('');
-      var tabs=[{k:'Overview',html:(d.desc||'<p class="dwr-empty">Summary coming soon.</p>')}];
-      if(d.slides.length){tabs.push({k:'Deck ('+d.slides.length+')',html:'<div class="dwr-deck">'+d.slides.map(function(s,i){var n=('0'+(i+1)).slice(-2);var cap=s.cap.replace(/^\d+\s*[·.–\-]\s*/,'');return '<figure class="dwr-slide"><div class="dwr-sn">'+n+'</div><img src="'+s.src+'" data-full="'+s.full+'" alt=""/><figcaption>'+cap+'</figcaption></figure>';}).join('')+'</div>'});}
-      else if(d.images.length){tabs.push({k:'Gallery',html:'<div class="dwr-gal">'+d.images.map(function(im){return '<img src="'+im.src+'" data-full="'+im.full+'" alt="'+im.alt+'"/>';}).join('')+'</div>'});}
-      tabs.push({k:'Details',html:d.details||'<p class="dwr-empty">More details, files and screenshots will be added here.</p>'});
+      elT.textContent=d.title;elS.textContent=d.sub||'Case detail';
+      elM.innerHTML=d.tags.slice(0,6).map(function(t){return '<span class="dwr-tag">'+t+'</span>';}).join('');
+      var hero=(d.slides[0]&&d.slides[0].full)||(d.images[0]&&d.images[0].full)||'';
+      var heroHTML=hero?'<div class="dwr-hero"><img src="'+hero+'" alt="" loading="lazy"/></div>':'';
+      var facts=d.tags.length?'<div class="dwr-facts">'+d.tags.slice(0,4).map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>':'';
+      var ovHTML=heroHTML+'<div class="dwr-section">'+(d.desc||'<p class="dwr-empty">Summary coming soon — add it in the card or ask me to fill it in.</p>')+facts+'</div>';
+      var tabs=[{k:'Overview',html:ovHTML}];
+      if(d.slides.length){tabs.push({k:'Deck &middot; '+d.slides.length,html:'<div class="dwr-deck">'+d.slides.map(function(s,i){var n=('0'+(i+1)).slice(-2);var cap=s.cap.replace(/^\d+\s*[·.–\-]\s*/,'');return '<figure class="dwr-slide"><div class="dwr-sn">'+n+'</div><img src="'+s.full+'" alt="" loading="lazy"/><figcaption>'+(cap||'Slide '+n)+'</figcaption></figure>';}).join('')+'</div>'});}
+      else if(d.images.length){tabs.push({k:'Gallery',html:'<div class="dwr-gal">'+d.images.map(function(im){return '<img src="'+im.full+'" alt="'+im.alt+'" loading="lazy"/>';}).join('')+'</div>'});}
+      tabs.push({k:'Details',html:d.details||'<div class="dwr-section"><p class="dwr-empty">Objective, role, actions, result and links for this project will live here. Add them in <b>projects.html</b> or ask me to fill it in.</p></div>'});
       function show(i){elB.innerHTML=tabs[i].html;[].forEach.call(elTabs.children,function(b){b.classList.toggle('on',+b.dataset.i===i);});
-        elB.querySelectorAll('[data-full]').forEach(function(im){im.style.cursor='zoom-in';im.addEventListener('click',function(){var lb=document.getElementById('lightbox');if(lb){lb.querySelector('img').src=im.getAttribute('data-full');lb.classList.add('open');}});});}
+        elB.querySelectorAll('.dwr-deck img,.dwr-gal img').forEach(function(im){im.style.cursor='zoom-in';im.addEventListener('click',function(){var lb=document.getElementById('lightbox');if(lb){lb.querySelector('img').src=im.getAttribute('src');lb.classList.add('open');}});});}
       elTabs.innerHTML=tabs.map(function(t,i){return '<button class="dwr-tab'+(i===0?' on':'')+'" data-i="'+i+'">'+t.k+'</button>';}).join('');
       [].forEach.call(elTabs.children,function(b){b.addEventListener('click',function(){show(+b.dataset.i);});});
-      show(0);ov.classList.add('open');document.body.classList.add('dwr-lock');
+      show(0);ov.classList.add('open');document.body.classList.add('dwr-lock');ov.scrollTop=0;
     }
     triggers.forEach(function(t){t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();
       var card=t.closest('[data-card]')||t.closest('.proj')||t.closest('.scard')||t;open(card);});});
