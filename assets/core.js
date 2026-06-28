@@ -275,14 +275,16 @@
       var desc=[].map.call(ps,function(p){return '<p>'+p.innerHTML+'</p>';}).join('');
       var tags=[].map.call(card.querySelectorAll('.stackline span,.chip,.meta span,.tag'),function(s){return s.textContent.trim();}).filter(Boolean);
       var seen={},imgs=[];[].forEach.call(card.querySelectorAll('img'),function(im){var s=im.getAttribute('data-full')||im.getAttribute('src');if(s&&!seen[s]){seen[s]=1;imgs.push({src:im.getAttribute('src'),full:s,alt:im.getAttribute('alt')||''});}});
-      return {title:h?h.textContent:(card.getAttribute('data-title')||'Details'),sub:card.getAttribute('data-sub')||'',desc:desc,tags:tags,images:imgs,details:card.getAttribute('data-details')||''};
+      var slides=[].map.call(card.querySelectorAll('figure'),function(fg){var im=fg.querySelector('img');var cap=fg.querySelector('figcaption');return {src:im?im.getAttribute('src'):'',full:im?(im.getAttribute('data-full')||im.getAttribute('src')):'',cap:cap?cap.textContent.trim():''};}).filter(function(s){return s.full;});
+      return {title:h?h.textContent:(card.getAttribute('data-title')||'Details'),sub:card.getAttribute('data-sub')||'',desc:desc,tags:tags,images:imgs,slides:slides,details:card.getAttribute('data-details')||''};
     }
     function open(card){
       var d=extract(card);
       elT.textContent=d.title;elS.textContent=d.sub;
       elM.innerHTML=d.tags.map(function(t){return '<span class="dwr-tag">'+t+'</span>';}).join('');
       var tabs=[{k:'Overview',html:(d.desc||'<p class="dwr-empty">Summary coming soon.</p>')}];
-      if(d.images.length)tabs.push({k:'Gallery',html:'<div class="dwr-gal">'+d.images.map(function(im){return '<img src="'+im.src+'" data-full="'+im.full+'" alt="'+im.alt+'"/>';}).join('')+'</div>'});
+      if(d.slides.length){tabs.push({k:'Deck ('+d.slides.length+')',html:'<div class="dwr-deck">'+d.slides.map(function(s,i){var n=('0'+(i+1)).slice(-2);var cap=s.cap.replace(/^\d+\s*[·.–\-]\s*/,'');return '<figure class="dwr-slide"><div class="dwr-sn">'+n+'</div><img src="'+s.src+'" data-full="'+s.full+'" alt=""/><figcaption>'+cap+'</figcaption></figure>';}).join('')+'</div>'});}
+      else if(d.images.length){tabs.push({k:'Gallery',html:'<div class="dwr-gal">'+d.images.map(function(im){return '<img src="'+im.src+'" data-full="'+im.full+'" alt="'+im.alt+'"/>';}).join('')+'</div>'});}
       tabs.push({k:'Details',html:d.details||'<p class="dwr-empty">More details, files and screenshots will be added here.</p>'});
       function show(i){elB.innerHTML=tabs[i].html;[].forEach.call(elTabs.children,function(b){b.classList.toggle('on',+b.dataset.i===i);});
         elB.querySelectorAll('[data-full]').forEach(function(im){im.style.cursor='zoom-in';im.addEventListener('click',function(){var lb=document.getElementById('lightbox');if(lb){lb.querySelector('img').src=im.getAttribute('data-full');lb.classList.add('open');}});});}
@@ -292,5 +294,46 @@
     }
     triggers.forEach(function(t){t.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();
       var card=t.closest('[data-card]')||t.closest('.proj')||t.closest('.scard')||t;open(card);});});
+  })();
+
+  /* ===== Recruiter Mode — 60-second scan overlay (all pages) ===== */
+  (function(){
+    if(PF_EDIT) return;
+    var LI='https://www.linkedin.com/in/t%E1%BA%A5n-ho%C3%A0ng-nh%C6%B0-qu%E1%BB%91c-933941280/';
+    var toggle=document.createElement('button');
+    toggle.className='rec-toggle';toggle.type='button';toggle.setAttribute('aria-label','Open recruiter mode');
+    toggle.innerHTML='<span class="rd"></span> Recruiter mode';
+    document.body.appendChild(toggle);
+    var ov=document.createElement('div');ov.className='rec-ov';
+    ov.innerHTML='<div class="rec-card" role="dialog" aria-modal="true"><button class="rec-x" aria-label="Close">&times;</button>'+
+      '<div class="rec-ey">Recruiter mode &middot; 60-second scan</div>'+
+      '<h2 class="rec-name">Hoàng Như Quốc Tấn</h2>'+
+      '<div class="rec-role">Business Development &amp; Marketing &rarr; Influencer Management &middot; UEH</div>'+
+      '<p class="rec-pitch">Target-driven UEH graduate (GPA 3.98, TOEIC 970). I optimize what converts and automate what slows things down &mdash; now bringing that operator mindset into influencer management.</p>'+
+      '<div class="rec-kpis">'+
+        '<div class="rec-kpi"><b>50%</b><span>SQL&rarr;Student conversion</span></div>'+
+        '<div class="rec-kpi"><b>+30%</b><span>YoY Q3 revenue</span></div>'+
+        '<div class="rec-kpi"><b>&minus;20%</b><span>Manual workload &middot; N8N</span></div>'+
+        '<div class="rec-kpi"><b>30+</b><span>Students led &middot; campaign</span></div>'+
+      '</div>'+
+      '<div class="rec-proof"><div class="rec-pt">Proof in one line each</div><ul>'+
+        '<li><b>PMAX</b> &mdash; BD Trainee: reworked sales scripts + built N8N automation &rarr; conversion &amp; revenue up.</li>'+
+        '<li><b>xSCORE</b> &mdash; BD Intern: 2 tailored proposals, sales contracts, landing-page rebuild.</li>'+
+        '<li><b>Leadership</b> &mdash; led 30+ students, engaged 100+ children, raised 12.5M VND (charity).</li>'+
+      '</ul></div>'+
+      '<div class="rec-cta">'+
+        '<a class="btn btn-primary" href="assets/Hoang-Nhu-Quoc-Tan-CV.pdf" download>Download CV <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span></a>'+
+        '<a class="btn btn-ghost" href="mailto:harryhoang10@gmail.com">Email</a>'+
+        '<a class="btn btn-ghost" href="'+LI+'" target="_blank" rel="noopener">LinkedIn</a>'+
+        '<button class="btn btn-ghost rec-close2" type="button">See full portfolio</button>'+
+      '</div></div>';
+    document.body.appendChild(ov);
+    function open(){ov.classList.add('open');document.body.classList.add('dwr-lock');}
+    function close(){ov.classList.remove('open');document.body.classList.remove('dwr-lock');}
+    toggle.addEventListener('click',open);
+    ov.querySelector('.rec-x').addEventListener('click',close);
+    ov.querySelector('.rec-close2').addEventListener('click',close);
+    ov.addEventListener('click',function(e){if(e.target===ov)close();});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('open'))close();});
   })();
 
